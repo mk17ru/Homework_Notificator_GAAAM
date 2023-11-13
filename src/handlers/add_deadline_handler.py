@@ -1,6 +1,9 @@
+from src.db.connection import conn
+
 from telegram import (
     Update
 )
+
 from telegram.ext import (
     CommandHandler,
     ContextTypes,
