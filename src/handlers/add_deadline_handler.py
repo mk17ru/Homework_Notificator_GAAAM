@@ -1,5 +1,3 @@
-from src.db.connection import conn
-
 from telegram import (
     Update
 )
@@ -12,6 +10,8 @@ from telegram.ext import (
     filters,
 )
 
+from src.handlers.handlers import cancel_callback
+from src.db.connection import conn
 
 ADD_SUBJECT, ADD_ACTIVITY, ADD_DEADLINE  = range(3)
 admin_usernames = ["gkashin"]
@@ -57,8 +57,6 @@ async def add_deadline_callback(update: Update, context: ContextTypes.DEFAULT_TY
 
     return ConversationHandler.END
 
-async def cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    return ConversationHandler.END
 
 def add_deadline_builder() -> ConversationHandler:
     return ConversationHandler(
