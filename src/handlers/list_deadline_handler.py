@@ -13,7 +13,7 @@ from telegram.ext import (
 )
 
 from src.handlers.handlers import cancel_callback
-from src.db.helpers import get_full_relation
+from src.db.helpers import get_full_relation, run_sql
 
 LIST_DEADLINE  = range(1)
 
@@ -43,11 +43,7 @@ async def list_deadline_callback(update: Update, context: ContextTypes.DEFAULT_T
         """
     )
 
-    cur = conn.cursor()
-    cur.execute(sql)
-    result = cur.fetchall()
-    conn.commit()
-    conn.close()
+    result = run_sql(sql)
 
     await update.message.reply_text('\n'.join([f'{message[0]}: expires {message[1]}' for message in result]))
 
