@@ -15,9 +15,10 @@ from telegram.ext import (
 
 from src.handlers.handlers import cancel_callback
 from src.db.connection import conn
+from src.db.helpers import get_full_relation
 
 ADD_SUBJECT, ADD_ACTIVITY, ADD_DEADLINE  = range(3)
-admin_usernames = ["gkashin"]
+admin_usernames = ["gkashin", "imashevchenko"]
 
 async def start_add_deadline_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     is_admin = update.message.from_user.username in admin_usernames
@@ -25,12 +26,7 @@ async def start_add_deadline_callback(update: Update, context: ContextTypes.DEFA
         await update.message.reply_text("Sorry, you're not allowed to create a deadline.")
         return ConversationHandler.END
 
-    sql = "SELECT * FROM SUBJECTS;"
-
-    cur = conn.cursor()
-    cur.execute(sql)
-    result = cur.fetchall()
-    conn.commit()
+    result = get_full_relation("SUBJECTS")
 
     subjects = [KeyboardButton(row[1]) for row in result]
     reply_markup = ReplyKeyboardMarkup([subjects], one_time_keyboard=True)
@@ -43,12 +39,7 @@ async def add_subject_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     context.user_data["SUBJECT"] = update.message.text
     subject = context.user_data["SUBJECT"]
 
-    sql = "SELECT * FROM ACTIVITIES;"
-
-    cur = conn.cursor()
-    cur.execute(sql)
-    result = cur.fetchall()
-    conn.commit()
+    result = get_full_relation("ACTIVITIES")
 
     activities = [row[2] for row in result]
     reply_markup = ReplyKeyboardMarkup([activities], one_time_keyboard=True)
