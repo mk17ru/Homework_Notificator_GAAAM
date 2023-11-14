@@ -1,7 +1,7 @@
 from src.db.connection import conn
 
 from telegram import (
-    Update
+    Update, KeyboardButton, ReplyKeyboardMarkup
 )
 
 from telegram.ext import (
@@ -13,11 +13,18 @@ from telegram.ext import (
 )
 
 from src.handlers.handlers import cancel_callback
+from src.db.helpers import get_full_relation
 
 LIST_DEADLINE  = range(1)
 
 async def start_list_deadline_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text("Введите предмет:")
+
+    result = get_full_relation("SUBJECTS")
+
+    subjects = [KeyboardButton(row[1]) for row in result]
+    reply_markup = ReplyKeyboardMarkup([subjects], one_time_keyboard=True)
+
+    await update.message.reply_text("Выберите предмет", reply_markup=reply_markup)
 
     return LIST_DEADLINE
 
@@ -37,10 +44,12 @@ async def list_deadline_callback(update: Update, context: ContextTypes.DEFAULT_T
     )
 
     cur = conn.cursor()
-    cur.execute(sql, (context.user_data["SUBJECT"]))
-    await update.message.reply_text('\n'.join([f'{message[0]}: expires {message[1]}' for message in cur.fetchall()]))
+    cur.execute(sql)
+    result = cur.fetchall()
     conn.commit()
     conn.close()
+
+    await update.message.reply_text('\n'.join([f'{message[0]}: expires {message[1]}' for message in result]))
 
     return ConversationHandler.END
 
