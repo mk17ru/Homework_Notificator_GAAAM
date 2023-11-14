@@ -26,7 +26,6 @@ SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly"
 
 
 async def start_authorize_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text("Authorize callback")
     creds = None
     if os.path.exists("token.json"):
         creds = Credentials.from_authorized_user_file("token.json", SCOPES)
