@@ -23,10 +23,10 @@ CREATE TABLE IF NOT EXISTS activities (
     FOREIGN KEY (subject_id) REFERENCES subjects(id)
 );
 
-CREATE TABLE IF NOT EXISTS deadlines (
+CREATE TABLE IF NOT EXISTS deadlines1 (
     id SERIAL NOT NULL PRIMARY KEY,
-    activity_id INTEGER,
-    deadline DATE,
+    activity_id INTEGER UNIQUE,
+    deadline TIMESTAMP,
     FOREIGN KEY (activity_id) REFERENCES activities(id)
 );
 
