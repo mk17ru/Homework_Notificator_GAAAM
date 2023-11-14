@@ -1,7 +1,10 @@
 from src.db.connection import conn
+from datetime import datetime
 
 from telegram import (
-    Update
+    Update,
+    ReplyKeyboardMarkup,
+    KeyboardButton
 )
 
 from telegram.ext import (
@@ -22,14 +25,35 @@ async def start_add_deadline_callback(update: Update, context: ContextTypes.DEFA
         await update.message.reply_text("Sorry, you're not allowed to create a deadline.")
         return ConversationHandler.END
 
-    await update.message.reply_text("Введите предмет:")
+    sql = "SELECT * FROM SUBJECTS;"
+
+    cur = conn.cursor()
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+
+    subjects = [KeyboardButton(row[1]) for row in result]
+    reply_markup = ReplyKeyboardMarkup([subjects], one_time_keyboard=True)
+
+    await update.message.reply_text("Выберите предмет", reply_markup=reply_markup)
 
     return ADD_SUBJECT
 
 async def add_subject_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["SUBJECT"] = update.message.text
+    subject = context.user_data["SUBJECT"]
 
-    await update.message.reply_text("Ввведите название активности:")
+    sql = "SELECT * FROM ACTIVITIES;"
+
+    cur = conn.cursor()
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+
+    activities = [row[2] for row in result]
+    reply_markup = ReplyKeyboardMarkup([activities], one_time_keyboard=True)
+
+    await update.message.reply_text("Выберите активность", reply_markup=reply_markup)
 
     return ADD_ACTIVITY
 
@@ -37,7 +61,7 @@ async def add_subject_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 async def add_activity_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["ACTIVITY"] = update.message.text
 
-    await update.message.reply_text("Ввведите дедлайн:")
+    await update.message.reply_text('Введите дату дедлайна в формате yyyy-mm-dd hh:mm')
 
     return ADD_DEADLINE
 
@@ -46,14 +70,23 @@ async def add_deadline_callback(update: Update, context: ContextTypes.DEFAULT_TY
 
     activity_id = context.user_data["ACTIVITY"]
     deadline = context.user_data["DEADLINE"]
-    
-    sql = "INSERT INTO deadlines(activity_id, deadline) values (%s, %s)"
+
+    try:
+        date = datetime.strptime(deadline, '%Y-%m-%d %H:%M')
+    except ValueError:
+        await update.message.reply_text('Неверный формат даты.')
+        return ConversationHandler.END
+            
+    sql = "INSERT INTO deadlines(activity_id, deadline) values (1, %s)"
 
     cur = conn.cursor()
-    data = (activity_id, deadline)
+    data = (activity_id, date)
     cur.execute(sql, data)
     conn.commit()
+
     conn.close()
+
+    await update.message.reply_text('Дедлайн успешно обновлен!')
 
     return ConversationHandler.END
 
