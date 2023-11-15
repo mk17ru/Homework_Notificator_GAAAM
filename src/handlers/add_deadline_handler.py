@@ -18,7 +18,7 @@ from src.db.connection import conn
 from src.db.helpers import get_full_relation
 
 ADD_SUBJECT, ADD_ACTIVITY, ADD_DEADLINE  = range(3)
-admin_usernames = ["gkashin", "imashevchenko"]
+admin_usernames = ["gkashin", "imashevchenko", "chichaaaps"]
 
 async def start_add_deadline_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     is_admin = update.message.from_user.username in admin_usernames
