@@ -32,7 +32,7 @@ async def subscribe_deadline_callback(update: Update, context: ContextTypes.DEFA
     subject = context.user_data["SUBJECT"]
 
     subject_id = run_sql(f"SELECT id FROM subjects AS s WHERE s.name = '{subject}'")[0][0]
-    sql = f"INSERT INTO deadline_follows(following_user_id, subject_id) VALUES ({chat_id}, {subject_id});"
+    sql = f"INSERT INTO deadline_follows(following_chat_id, subject_id) VALUES ({chat_id}, {subject_id});"
     run_sql(sql)
     await update.message.reply_text("Подписка добавлена")
     return ConversationHandler.END

@@ -10,7 +10,7 @@ from telegram.ext import (
 from src.handlers.handlers import *
 from src.handlers.add_deadline_handler import *
 from src.handlers.list_deadline_handler import *
-from src.handlers.notifier import notifier
+from src.handlers.notifier import deadline_notifier
 from src.handlers.subscribe_deadline_handler import *
 from src.handlers.subscribe_table_handler import *
 from src.handlers.authorize_handler import *
@@ -47,7 +47,7 @@ def bot_start() -> None:
 
     job_queue = application.job_queue
 
-    job_queue.run_repeating(notifier, interval=10, first=0)
+    job_queue.run_repeating(deadline_notifier, interval=10, first=0)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
