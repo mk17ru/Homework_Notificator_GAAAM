@@ -1,5 +1,3 @@
-from src.db.connection import conn
-
 from telegram import (
     Update, KeyboardButton, ReplyKeyboardMarkup
 )
@@ -18,9 +16,7 @@ from src.db.helpers import get_full_relation, run_sql
 LIST_DEADLINE  = range(1)
 
 async def start_list_deadline_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-
-    result = get_full_relation("SUBJECTS")
-
+    result = get_full_relation("subjects")
     subjects = [KeyboardButton(row[1]) for row in result]
     reply_markup = ReplyKeyboardMarkup([subjects], one_time_keyboard=True)
 
@@ -34,7 +30,7 @@ async def list_deadline_callback(update: Update, context: ContextTypes.DEFAULT_T
     sql = (
         f""" 
         SELECT a.name, d.deadline 
-            FROM deadlines AS d
+            FROM deadlines1 AS d
                 INNER JOIN activities AS a 
                 ON d.activity_id = a.id
                 INNER JOIN subjects AS s 

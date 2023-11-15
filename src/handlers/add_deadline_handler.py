@@ -26,8 +26,7 @@ async def start_add_deadline_callback(update: Update, context: ContextTypes.DEFA
         await update.message.reply_text("Sorry, you're not allowed to create a deadline.")
         return ConversationHandler.END
 
-    result = get_full_relation("SUBJECTS")
-
+    result = get_full_relation("subjects")
     subjects = [KeyboardButton(row[1]) for row in result]
     reply_markup = ReplyKeyboardMarkup([subjects], one_time_keyboard=True)
 
@@ -39,11 +38,9 @@ async def add_subject_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     context.user_data["SUBJECT"] = update.message.text
     subject = context.user_data["SUBJECT"]
 
-    result = get_full_relation("ACTIVITIES")
-
+    result = get_full_relation("activities")
     activities = [row[2] for row in result]
     reply_markup = ReplyKeyboardMarkup([activities], one_time_keyboard=True)
-
     await update.message.reply_text("Выберите активность", reply_markup=reply_markup)
 
     return ADD_ACTIVITY
@@ -68,14 +65,11 @@ async def add_deadline_callback(update: Update, context: ContextTypes.DEFAULT_TY
         await update.message.reply_text('Неверный формат даты.')
         return ConversationHandler.END
             
-    sql = "INSERT INTO deadlines(activity_id, deadline) values (1, %s)"
+    sql = "INSERT INTO deadlines1(activity_id, deadline) values (1, %s)"
 
     cur = conn.cursor()
-    data = (activity_id, date)
-    cur.execute(sql, data)
+    cur.execute(sql, (date,))
     conn.commit()
-
-    conn.close()
 
     await update.message.reply_text('Дедлайн успешно обновлен!')
 

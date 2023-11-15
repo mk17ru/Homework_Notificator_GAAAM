@@ -1,9 +1,9 @@
 from src.db.connection import conn
 
 
-def run_sql(sql, data):
+def run_sql(sql, data=None):
     cur = conn.cursor()
-    cur.execute(sql, data)
+    cur.execute(sql, data or ())
     result = None
     try: 
         result = cur.fetchall()
@@ -15,5 +15,4 @@ def run_sql(sql, data):
 
 def get_full_relation(name):
     sql = f"SELECT * FROM {name};"
-
-    return run_sql(sql, ())
+    return run_sql(sql)
