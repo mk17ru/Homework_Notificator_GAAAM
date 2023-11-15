@@ -6,8 +6,9 @@ DROP TABLE IF EXISTS users cascade;
 DROP TABLE IF EXISTS activities cascade;
 
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL NOT NULL PRIMARY KEY,
-    is_admin BOOL
+    chat_id INTEGER,
+    is_admin BOOL,
+    username VARCHAR PRIMARY KEY 
 );
 
 CREATE TABLE IF NOT EXISTS subjects (
@@ -32,15 +33,16 @@ CREATE TABLE IF NOT EXISTS deadlines (
 
 CREATE TABLE IF NOT EXISTS deadline_follows (
     id SERIAL NOT NULL PRIMARY KEY,
-    following_user_id INTEGER,
+    following_chat_id INTEGER,
     subject_id INTEGER,
-    FOREIGN KEY (following_user_id) REFERENCES users(id),
     FOREIGN KEY (subject_id) REFERENCES subjects(id)
 );
 
 CREATE TABLE IF NOT EXISTS google_sheets_follows (
     id SERIAL NOT NULL PRIMARY KEY,
-    following_user_id INTEGER,
-    field VARCHAR,
-    FOREIGN KEY (following_user_id) REFERENCES users(id)
+    following_chat_id INTEGER,
+    cells_range VARCHAR,
+    range_hash VARCHAR,
+    prev_value VARCHAR,
+    table_id VARCHAR
 );
