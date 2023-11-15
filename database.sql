@@ -12,17 +12,18 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS subjects (
     id SERIAL NOT NULL PRIMARY KEY,
-    name VARCHAR
+    name VARCHAR UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS activities (
     id SERIAL NOT NULL PRIMARY KEY,
     subject_id INTEGER,
     name VARCHAR,
+    UNIQUE (subject_id, name),
     FOREIGN KEY (subject_id) REFERENCES subjects(id)
 );
 
-CREATE TABLE IF NOT EXISTS deadlines1 (
+CREATE TABLE IF NOT EXISTS deadlines (
     id SERIAL NOT NULL PRIMARY KEY,
     activity_id INTEGER UNIQUE,
     deadline TIMESTAMP,
