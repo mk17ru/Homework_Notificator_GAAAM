@@ -11,8 +11,11 @@ from src.handlers.handlers import *
 from src.handlers.add_deadline_handler import *
 from src.handlers.list_deadline_handler import *
 from src.handlers.notifier import deadline_notifier
+from src.handlers.notifier import google_sheets_notifier
 from src.handlers.subscribe_deadline_handler import *
 from src.handlers.subscribe_table_handler import *
+from src.handlers.unsubscribe_table import *
+from src.handlers.subscription_list_handler import *
 from src.handlers.authorize_handler import *
 
 from src.data_init import TOKEN
@@ -29,6 +32,8 @@ def bot_start() -> None:
     application.add_handler(add_deadline_builder())
     application.add_handler(list_deadline_builder())
     application.add_handler(subscribe_table_builder())
+    application.add_handler(subscription_list_builder())
+    application.add_handler(unsubscribe_table_builder())
     application.add_handler(authorize_builder())
     application.add_handler(subscribe_deadline_builder())
 
@@ -38,7 +43,9 @@ def bot_start() -> None:
             BotCommand("start", "login user"),
             BotCommand("add_deadline", "add deadline"),
             BotCommand("list_deadline", "list deadlines"),
+            BotCommand("subscription_list", "subscription list"),
             BotCommand("subscribe_changes", "subscribe changes"),
+            BotCommand("unsubscribe_table", "unsubscribe table"),
             BotCommand("subscribe_deadline", "subscribe deadline"),
             BotCommand("authorize", "google authorization"),
             BotCommand("cancel", "return back"),
@@ -48,6 +55,7 @@ def bot_start() -> None:
     job_queue = application.job_queue
 
     job_queue.run_repeating(deadline_notifier, interval=10, first=0)
+    job_queue.run_repeating(google_sheets_notifier, interval=10, first=0)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 

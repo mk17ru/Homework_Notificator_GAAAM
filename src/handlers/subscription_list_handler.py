@@ -25,6 +25,8 @@ async def subscription_list_callback(update: Update, context: ContextTypes.DEFAU
     db_result = get_full_relation("google_sheets_follows")
     for val in db_result:
         msg = msg + str(val) + '\n'
+    await update.message.reply_text(msg)
+
     return ConversationHandler.END
 
 

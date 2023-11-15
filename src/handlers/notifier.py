@@ -14,6 +14,7 @@ from telegram.ext import (
 )
 
 from src.db.helpers import run_sql
+from src.utils import get_values
 
 
 def delete_outdated_deadlines():
@@ -51,5 +52,41 @@ async def deadline_notifier(context: CallbackContext):
                 )
                 break
     delete_outdated_deadlines()
+
+
+async def google_sheets_notifier(context: CallbackContext):
+    select_sql = (
+        f""" 
+               SELECT following_chat_id, table_id, cells_range, range_hash, prev_value 
+               FROM google_sheets_follows;
+        """
+    )
+
+    update_sql = f"""
+                        UPDATE google_sheets_follows 
+                        SET range_hash = %s, prev_value = %s 
+                        WHERE following_chat_id = %s AND table_id = %s AND cells_range = %s;
+                         """
+
+    db_result = run_sql(select_sql, [])
+
+    print(db_result)
+
+    for message in db_result:
+        cur_value = get_values(message[1], message[2])
+        print(cur_value)
+        if not cur_value:
+            continue
+        cur_hash = hash(str(cur_value))
+        if not message[3] or not message[4]:
+            run_sql(update_sql, [cur_hash, cur_value, message[0], message[1], message[2]])
+            continue
+        if str(cur_hash) != message[3]:
+            await context.bot.send_message(
+                message[0],
+                text="New values in cells " + message[2]
+            )
+            run_sql(update_sql, [cur_hash, cur_value, message[0], message[1], message[2]])
+
 
 
