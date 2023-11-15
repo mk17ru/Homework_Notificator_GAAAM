@@ -1,3 +1,3 @@
 import os
 
-TOKEN = 'ВСТАВЬ СЮДА ТОКЕН'
+TOKEN = os.getenv("TOKEN")
