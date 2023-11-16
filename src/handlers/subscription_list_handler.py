@@ -33,7 +33,6 @@ async def subscription_list_callback(update: Update, context: ContextTypes.DEFAU
                """
     )
     db_result = run_sql(sql, [update.message.chat.id])
-    print("db_result: " + str(db_result))
     for val in db_result:
         msg = msg + f"Deadline for homework {val[1]} {val[2]} {str(val[3])} UTC" + '\n'
 
