@@ -47,7 +47,7 @@ async def deadline_notifier(context: CallbackContext):
             if current + current_interval - timedelta(seconds=10) <= message[3] <= current + current_interval:
                 await context.bot.send_message(
                     message[0],
-                    text="Deadline for homework " + message[1] + " " + message[2] + " " + str(message[3])
+                    text=f"Deadline for homework {message[1]} {message[2]} {str(message[3])} UTC"
                 )
                 break
     delete_outdated_deadlines()

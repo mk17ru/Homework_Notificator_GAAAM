@@ -105,7 +105,7 @@ async def add_activity_callback(update: Update, context: ContextTypes.DEFAULT_TY
     activity_id = result[0][0]
     context.user_data["ACTIVITY_ID"] = activity_id
 
-    await update.message.reply_text('Введите дату дедлайна в формате dd-mm-yyyy hh:mm')
+    await update.message.reply_text('Введите дату дедлайна в формате dd-mm-yyyy hh:mm UTC')
 
     return ADD_DEADLINE
 
