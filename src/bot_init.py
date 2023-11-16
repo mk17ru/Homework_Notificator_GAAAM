@@ -56,8 +56,8 @@ def bot_start() -> None:
 
     job_queue = application.job_queue
 
-    job_queue.run_repeating(deadline_notifier, interval=10, first=0)
-    job_queue.run_repeating(google_sheets_notifier, interval=10, first=0)
+    job_queue.run_repeating(deadline_notifier, interval=10, first=0, job_kwargs={'misfire_grace_time': 15*60})
+    job_queue.run_repeating(google_sheets_notifier, interval=10, first=0, job_kwargs={'misfire_grace_time': 15*60})
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
