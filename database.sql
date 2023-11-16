@@ -21,21 +21,23 @@ CREATE TABLE IF NOT EXISTS activities (
     subject_id INTEGER,
     name VARCHAR,
     UNIQUE (subject_id, name),
-    FOREIGN KEY (subject_id) REFERENCES subjects(id)
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
 );
+
+
 
 CREATE TABLE IF NOT EXISTS deadlines (
     id SERIAL NOT NULL PRIMARY KEY,
     activity_id INTEGER UNIQUE,
     deadline TIMESTAMP,
-    FOREIGN KEY (activity_id) REFERENCES activities(id)
+    FOREIGN KEY (activity_id) REFERENCES activities(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS deadline_follows (
     id SERIAL NOT NULL PRIMARY KEY,
     following_chat_id INTEGER,
     subject_id INTEGER,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id)
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS google_sheets_follows (
