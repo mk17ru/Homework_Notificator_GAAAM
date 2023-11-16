@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, timedelta, timezone
 from telegram import (
     Update,
@@ -77,7 +78,7 @@ async def google_sheets_notifier(context: CallbackContext):
         print(cur_value)
         if not cur_value:
             continue
-        cur_hash = hash(str(cur_value))
+        cur_hash = hashlib.sha256(str(cur_value).encode('utf-8')).hexdigest()
         if not message[3] or not message[4]:
             run_sql(update_sql, [cur_hash, cur_value, message[0], message[1], message[2]])
             continue
