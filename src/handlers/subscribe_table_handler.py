@@ -46,6 +46,10 @@ async def add_cells_range_callback(update: Update, context: ContextTypes.DEFAULT
 
 async def subscribe_table_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     cells_range = update.message.text
+    nums = "".join([c for c in cells_range if c.isdigit() or c == ":"]).split(':')
+    if len(nums) != 2 or nums[0] != nums[1]:
+        await update.message.reply_text("Некорректный формат ячеек! Диапазон должен быть строкой")
+        return ConversationHandler.END
     chat_id = str(update.message.chat.id)
     table_id = context.user_data["table_id"]
 

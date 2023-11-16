@@ -1,4 +1,5 @@
 import hashlib
+import ast
 from datetime import datetime, timedelta, timezone
 from telegram import (
     Update,
@@ -23,6 +24,29 @@ def delete_outdated_deadlines():
     sql = "DELETE FROM deadlines AS d WHERE d.deadline < (now() at time zone 'utc')"
     run_sql(sql)
 
+
+def ind_to_cell(start, diff):
+    rev = start[::-1]
+    ind = 0
+    is_first = True
+    mult = 1
+    for c in rev:
+        if is_first:
+            ind += ord(c) - ord('A')
+            is_first = False
+            continue
+        mult *= 26
+        ind += (ord(c) - ord('A') + 1) * mult
+
+    ind += diff
+    res = ''
+    is_first = 0
+    while ind > 0:
+        res += chr(ind % 26 + ord('A') - is_first)
+        is_first = 1
+        ind //= 26
+
+    return res[::-1]
 
 async def deadline_notifier(context: CallbackContext):
     sql = (
@@ -77,15 +101,31 @@ async def google_sheets_notifier(context: CallbackContext):
         cur_value = get_values(message[1], message[2])
         print(cur_value)
         if not cur_value:
+            print("problems with extracting from table!")
             continue
         cur_hash = hashlib.sha256(str(cur_value).encode('utf-8')).hexdigest()
-        if not message[3] or not message[4]:
+        if message[3] is None or message[4] is None:
             run_sql(update_sql, [cur_hash, cur_value, message[0], message[1], message[2]])
             continue
         if str(cur_hash) != message[3]:
+            prev_list = ast.literal_eval(message[4])
+            cur_list = ast.literal_eval(cur_value)
+            new_vals_added = {}
+            for i in range(0, len(cur_list)):
+                if i >= len(prev_list):
+                    new_vals_added[i] = cur_list[i]
+                    continue
+                if cur_list[i] != prev_list[i]:
+                    new_vals_added[i] = cur_list[i]
+            msg = f"ADDED in table https://docs.google.com/spreadsheets/d/{message[1]}:\n"
+            start = "".join([c for c in message[2] if not c.isdigit()]).split(':')[0]
+            nums = "".join([c for c in message[2] if c.isdigit() or c == ":"]).split(':')
+            for val in new_vals_added:
+                msg += f"{new_vals_added[val]} in cell {ind_to_cell(start, val)}{nums[0]}\n"
+
             await context.bot.send_message(
                 message[0],
-                text="New values in cells " + message[2]
+                msg
             )
             run_sql(update_sql, [cur_hash, cur_value, message[0], message[1], message[2]])
 

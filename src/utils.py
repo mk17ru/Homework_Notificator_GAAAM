@@ -30,10 +30,9 @@ def get_values(id, cells_range):
         if not values:
             # "Values is null"
             return None
-        msg = ""
+
         for row in values:
-            msg = msg + str(row) + "\n"
+            return str(row)
     except HttpError as err:
         # "Error occured: " + str(err)
         return None
-    return msg
