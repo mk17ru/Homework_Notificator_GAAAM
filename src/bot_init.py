@@ -36,6 +36,7 @@ def bot_start() -> None:
     application.add_handler(unsubscribe_table_builder())
     application.add_handler(authorize_builder())
     application.add_handler(subscribe_deadline_builder())
+    application.add_handler(unsubscribe_deadline_builder())
 
     __init_commands(
         application,
@@ -47,6 +48,7 @@ def bot_start() -> None:
             BotCommand("subscribe_changes", "subscribe changes"),
             BotCommand("unsubscribe_table", "unsubscribe table"),
             BotCommand("subscribe_deadline", "subscribe deadline"),
+            BotCommand("unsubscribe_deadline", "unsubscribe deadline"),
             BotCommand("authorize", "google authorization"),
             BotCommand("cancel", "return back"),
         ]

@@ -30,7 +30,7 @@ async def list_deadline_callback(update: Update, context: ContextTypes.DEFAULT_T
     sql = (
         f""" 
         SELECT a.name, d.deadline 
-            FROM deadlines1 AS d
+            FROM deadlines AS d
                 INNER JOIN activities AS a 
                 ON d.activity_id = a.id
                 INNER JOIN subjects AS s 
