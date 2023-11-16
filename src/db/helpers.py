@@ -24,3 +24,11 @@ def run_sql(sql, data=None):
 def get_full_relation(name):
     sql = f"SELECT * FROM {name};"
     return run_sql(sql)
+
+
+def is_admin(username):
+    sql = "SELECT is_admin from USERS WHERE username=%s"
+    result = run_sql(sql, (username,))
+    if result:
+        return result[0][0]
+    return False

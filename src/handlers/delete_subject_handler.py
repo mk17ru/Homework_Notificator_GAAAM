@@ -14,11 +14,15 @@ from telegram.ext import (
 )
 
 from src.handlers.handlers import cancel_callback
-from src.db.helpers import get_full_relation, run_sql
+from src.db.helpers import get_full_relation, run_sql, is_admin
 
 DELETE_SUBJECT = range(1)
 
 async def start_delete_subject_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not is_admin(update.message.chat.username):
+        await update.message.reply_text("Извините, вам не разрешено удалять предметы.")
+        return ConversationHandler.END
+
     subjects = get_full_relation("SUBJECTS")
     buttons = [KeyboardButton(subject[1]) for subject in subjects]
     reply_markup = ReplyKeyboardMarkup([buttons], one_time_keyboard=True)

@@ -16,15 +16,12 @@ from telegram.ext import (
 
 from src.handlers.handlers import cancel_callback
 from src.db.connection import conn
-from src.db.helpers import get_full_relation, run_sql
+from src.db.helpers import get_full_relation, run_sql, is_admin
 
 CHOOSE_SUBJECT, ADD_SUBJECT, CHOOSE_ACTIVITY, ADD_ACTIVITY, ADD_DEADLINE, START = range(6)
-admin_usernames = ["gkashin", "imashevchenko", "chichaaaps"]
-
 async def start_add_deadline_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    is_admin = update.message.from_user.username in admin_usernames
-    if not is_admin:
-        await update.message.reply_text("Sorry, you're not allowed to create a deadline.")
+    if not is_admin(update.message.chat.username):
+        await update.message.reply_text("Извините, вам не разрешено изменять дедлайны.")
         return ConversationHandler.END
 
     subjects = get_full_relation("SUBJECTS")

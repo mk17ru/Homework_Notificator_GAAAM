@@ -45,18 +45,18 @@ def bot_start() -> None:
     __init_commands(
         application,
         [
-            BotCommand("start", "login user"),
-            BotCommand("add_deadline", "add deadline"),
-            BotCommand("delete_subject", "delete subject"),
-            BotCommand("delete_activity", "delete activity"),
-            BotCommand("list_deadline", "list deadlines"),
-            BotCommand("subscription_list", "subscription list"),
-            BotCommand("subscribe_changes", "subscribe changes"),
-            BotCommand("unsubscribe_table", "unsubscribe table"),
-            BotCommand("subscribe_deadline", "subscribe deadline"),
-            BotCommand("unsubscribe_deadline", "unsubscribe deadline"),
-            BotCommand("authorize", "google authorization"),
-            BotCommand("cancel", "return back"),
+            BotCommand("start", "Начать"),
+            BotCommand("add_deadline", "Добавить дедлайн"),
+            BotCommand("delete_subject", "Удалить предмет"),
+            BotCommand("delete_activity", "Удалить активность"),
+            BotCommand("list_deadline", "Получить дедлайны"),
+            BotCommand("subscription_list", "Получить подписки"),
+            BotCommand("subscribe_changes", "Подписаться на изменения"),
+            BotCommand("unsubscribe_table", "Отписаться от изменений"),
+            BotCommand("subscribe_deadline", "Подписаться на дедлайн"),
+            BotCommand("unsubscribe_deadline", "Отписаться от дедлайна"),
+            BotCommand("authorize", "Авторизоваться с Google"),
+            BotCommand("cancel", "Выйти"),
         ]
     )
 

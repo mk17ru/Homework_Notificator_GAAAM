@@ -14,11 +14,15 @@ from telegram.ext import (
 )
 
 from src.handlers.handlers import cancel_callback
-from src.db.helpers import get_full_relation, run_sql
+from src.db.helpers import get_full_relation, run_sql, is_admin
 
 DELETE_ACTIVITY, CHOOSE_SUBJECT = range(2)
 
 async def start_delete_activity_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not is_admin(update.message.chat.username):
+        await update.message.reply_text("Извините, вам не разрешено удалять активности.")
+        return ConversationHandler.END
+
     subjects = get_full_relation("SUBJECTS")
     context.user_data["SUBJECTS"] = subjects
 
