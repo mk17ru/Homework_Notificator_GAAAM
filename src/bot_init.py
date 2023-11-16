@@ -9,6 +9,8 @@ from telegram.ext import (
 
 from src.handlers.handlers import *
 from src.handlers.add_deadline_handler import *
+from src.handlers.delete_subject_handler import *
+from src.handlers.delete_activity_handler import *
 from src.handlers.list_deadline_handler import *
 from src.handlers.notifier import deadline_notifier
 from src.handlers.notifier import google_sheets_notifier
@@ -37,12 +39,16 @@ def bot_start() -> None:
     application.add_handler(authorize_builder())
     application.add_handler(subscribe_deadline_builder())
     application.add_handler(unsubscribe_deadline_builder())
+    application.add_handler(delete_subject_builder())
+    application.add_handler(delete_activity_builder())
 
     __init_commands(
         application,
         [
             BotCommand("start", "login user"),
             BotCommand("add_deadline", "add deadline"),
+            BotCommand("delete_subject", "delete subject"),
+            BotCommand("delete_activity", "delete activity"),
             BotCommand("list_deadline", "list deadlines"),
             BotCommand("subscription_list", "subscription list"),
             BotCommand("subscribe_changes", "subscribe changes"),
