@@ -1,4 +1,5 @@
 from datetime import datetime
+import asyncio
 from telegram import (
     Update,
     ReplyKeyboardMarkup,
@@ -42,8 +43,8 @@ async def add_subject_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 
     result = run_sql(sql, (subject,))
     if not result:
-        # Make it now await function
-        await update.message.reply_text(f"Предмет с именем {subject} уже существует.")
+        await update.message.reply_text(f"Предмет с именем {subject} уже существует.\nВведите любое значение для продолжения.")
+        context.user_data.clear()
         return START
 
     subject_id = result[0][0]
@@ -54,13 +55,16 @@ async def add_subject_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     return ADD_ACTIVITY
 
 async def choose_subject_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    context.user_data["SUBJECT"] = update.message.text
+    if "SUBJECT" not in context.user_data:
+        context.user_data["SUBJECT"] = update.message.text
+
     subject = context.user_data["SUBJECT"]
     if subject == 'Создать новый':
         await update.message.reply_text("Введите название предмета:")
         return ADD_SUBJECT
 
     subjects = context.user_data["SUBJECTS"]
+    
     subject_id = next(filter(lambda record: record[1] == subject, subjects), None)[0]
     context.user_data["SUBJECT_ID"] = subject_id
 
@@ -75,32 +79,34 @@ async def choose_subject_callback(update: Update, context: ContextTypes.DEFAULT_
     return CHOOSE_ACTIVITY
 
 async def choose_activity_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    context.user_data["ACTIVITY"] = update.message.text
-    activity = context.user_data["ACTIVITY"]
-    if activity == 'Создать новую':
-        await update.message.reply_text("Введите название активности:")
-        return ADD_ACTIVITY
+    if "ACTIVITY" not in context.user_data:
+        context.user_data["ACTIVITY"] = update.message.text
+        activity = context.user_data["ACTIVITY"]
+        if activity == 'Создать новую':
+            await update.message.reply_text("Введите название активности:")
+            return ADD_ACTIVITY
 
-    activities = context.user_data["ACTIVITIES"]
-    activity_id = next(filter(lambda record: record[2] == activity, activities), None)[0]
-    context.user_data["ACTIVITY_ID"] = activity_id
+        activities = context.user_data["ACTIVITIES"]
+        activity_id = next(filter(lambda record: record[2] == activity, activities), None)[0]
+        context.user_data["ACTIVITY_ID"] = activity_id
 
     await update.message.reply_text('Введите дату дедлайна в формате dd-mm-yyyy hh:mm')
 
     return ADD_DEADLINE
 
 async def add_activity_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    context.user_data["ACTIVITY"] = update.message.text
-    activity = context.user_data["ACTIVITY"]
+    activity = update.message.text
 
     subject = context.user_data["SUBJECT"]
     subject_id = context.user_data["SUBJECT_ID"]
     sql = 'INSERT INTO ACTIVITIES(subject_id, name) VALUES(%s, %s) RETURNING id;'
     result = run_sql(sql, (subject_id, activity))
     if not result:
-        # Make it now await function
-        await update.message.reply_text(f"Активность с именем {activity} для предмета {subject} уже существует.")
-        return START
+        await update.message.reply_text(f"Активность с именем {activity} для предмета {subject} уже существует.\nВведите любое значение для продолжения.")
+        del context.user_data["ACTIVITY"]
+        return CHOOSE_SUBJECT
+    
+    context.user_data["ACTIVITY"] = update.message.text
 
     activity_id = result[0][0]
     context.user_data["ACTIVITY_ID"] = activity_id
@@ -115,13 +121,13 @@ async def add_deadline_callback(update: Update, context: ContextTypes.DEFAULT_TY
     activity_id = context.user_data["ACTIVITY_ID"]
 
     deadline = context.user_data["DEADLINE"]
-    context.user_data.clear()
+
     try:
         date = datetime.strptime(deadline, '%d-%m-%Y %H:%M')
-        timestamp = int(date.timestamp())
+        context.user_data.clear()
     except ValueError:
-        await update.message.reply_text('Неверный формат даты.')
-        return ConversationHandler.END
+        await update.message.reply_text('Неверный формат даты.\nВведите любое значение для продолжения.')
+        return CHOOSE_ACTIVITY
     
     sql = "INSERT INTO deadlines(activity_id, deadline) values (%s, %s) ON CONFLICT (activity_id) DO UPDATE SET deadline = excluded.deadline;"
     run_sql(sql, (activity_id, date))
